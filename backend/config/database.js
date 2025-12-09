@@ -1,24 +1,20 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') }); 
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
 const { Sequelize } = require('sequelize');
 
-
-const mysql = require('mysql2');
-
-const pool = mysql.createPool({
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-});
-
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error('Error de conexión:', err.message);
-    } else {
-        console.log(' Conexión a la base de datos exitosa!');
-        connection.release();
+const sequelize = new Sequelize(
+    process.env.DATABASE,   
+    process.env.USER,       
+    process.env.PASSWORD,   
+    {
+        host: process.env.HOST,
+        dialect: 'mysql'
     }
-});
+);
 
-module.exports = pool;
+sequelize.authenticate()
+    .then(() => console.log('Database Connection succesfully'))
+    .catch(err => console.error('Connection error: ', err.message));
+
+module.exports = sequelize;

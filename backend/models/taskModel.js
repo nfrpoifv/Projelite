@@ -1,30 +1,22 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database.js');
-const Employee = require('./Employee');
-const Project = require('./Project');
+const sequelize = require('../config/database');
 
 const Task = sequelize.define('Task', {
-    taskId: {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         field: 'IDTASK'
     },
-    employeeId: {
+    idEmployee: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Employee,
-            key: 'employeeId'
-        },
+        allowNull: true,
+        field: 'IDEMPLOYEE'
     },
-    projectId: {
+    idProject: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Project,
-            key: 'projectId'
-        },
+        allowNull: true,
+        field: 'IDPROJECT'
     },
     taskName: {
         type: DataTypes.STRING,
@@ -32,7 +24,8 @@ const Task = sequelize.define('Task', {
         field: 'TASK_NAME'
     }
 }, {
-    tableName: 'task',
+    tableName: 'TASK',
+    timestamps: false
 });
 
 module.exports = Task;

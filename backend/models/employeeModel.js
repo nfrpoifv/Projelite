@@ -1,14 +1,14 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database.js');
+const sequelize = require('../config/database');
 
 const EMPLOYEE = sequelize.define('Employee', {
     employeeId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: IDEMPLOYEE
+        field: 'IDEMPLOYEE'
     },
-    Name: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'NAME'
@@ -18,13 +18,14 @@ const EMPLOYEE = sequelize.define('Employee', {
         allowNull: false,
         field: 'LAST_NAME'
     },
-    Role: {
+    role: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'ROLE' 
+        field: 'ROLE'
     }
 }, {
-    tableName: 'employee',       
+    tableName: 'EMPLOYEE',
+    timestamps: false
 });
 
-module.exports = User;
+module.exports = EMPLOYEE;

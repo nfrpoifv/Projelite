@@ -1,24 +1,20 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 8080;
+const sequelize = require('./config/database');
 
+app.use(express.json());
 
-const db = require('./config/database'); 
+app.use('/', require('./routes/userRoutes'));
+app.use('/', require('./routes/taskRoutes'));
+app.use('/', require('./routes/projectRoutes'));
+app.use('/', require('./routes/employeeRoutes'));
 
-app.get('/', (req, res) => {
- 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error(' Error al obtener conexión:', err.message);
-      res.send('Error al conectar con la base de datos');
-    } else {
-      console.log('Conexión a la base de datos exitosa desde /');
-      connection.release();
-      res.send('IT WORKS and DB connected');
-    }
-  });
-});
+// Test connection
+sequelize.authenticate()
+    .then(() => console.log('Database connection successful!'))
+    .catch(err => console.error('Database connection error:', err));
 
 app.listen(port, () => {
-  console.log(`Listening in port: http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
