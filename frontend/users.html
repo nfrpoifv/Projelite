@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.8em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #00d4ff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 50px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .profile-header p {
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-header h2 {
+            font-size: 1.5em;
+            color: #00d4ff;
+        }
+
+        .btn-edit {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(138, 43, 226, 0.2);
+            color: #ba68c8;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .btn-edit:hover {
+            background: rgba(138, 43, 226, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1em;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            color: #00ff88;
+        }
+
+        .alert-error {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.4);
+            color: #ff6b6b;
+        }
+
+        .danger-zone {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 68, 68, 0.3);
+        }
+
+        .danger-zone h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .danger-zone p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.3);
+            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="dashboard.html" class="navbar-brand">MGMT</a>
+        <div class="navbar-links">
+            <a href="employees.html" class="nav-link">Employees</a>
+            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="tasks.html" class="nav-link">Tasks</a>
+            <a href="users.html" class="nav-link">Profile</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="alert-container"></div>
+
+        <div class="profile-card">
+            <div class="card-header">
+                <h2>Account Information</h2>
+                <button class="btn-edit" onclick="openEditModal()">Edit Profile</button>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">User ID</span>
+                <span class="info-value" id="user-id">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value" id="user-username">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Password</span>
+                <span class="info-value">••••••••</span>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-header">
+                <h2>Change Password</h2>
+                <button class="btn-edit" onclick="openPasswordModal()">Change Password</button>
+            </div>
+            
+            <p style="color: #888;">Keep your account secure by using a strong password.</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="danger-zone">
+                <h3>Warning</h3>
+                <p>Once you delete your account, there is no going back. Please be certain.</p>
+                <button class="btn-edit btn-danger" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+            </div>
+            <form id="edit-form">
+                <div class="form-group">
+                    <label for="edit-username">Username</label>
+                    <input type="text" id="edit-username" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Change Password</h2>
+            </div>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <input type="password" id="current-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm New Password</label>
+                    <input type="password" id="confirm-password" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn">Update Password</button>
+                    <button type="button" class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        const TOKEN = sessionStorage.getItem('token') || 'your-token-here';
+        let currentUser = null;
+
+        if (!sessionStorage.getItem('username')) {
+            window.location.href = 'index.html';
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 3000);
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    headers: { 'Authorization': TOKEN }
+                });
+                const users = await response.json();
+                
+                const username = sessionStorage.getItem('username');
+                currentUser = users.find(u => u.username === username);
+                
+                if (currentUser) {
+                    document.getElementById('profile-username').textContent = currentUser.username;
+                    document.getElementById('user-id').textContent = currentUser.id;
+                    document.getElementById('user-username').textContent = currentUser.username;
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showAlert('Error loading profile', 'error');
+            }
+        }
+
+        function openEditModal() {
+            document.getElementById('edit-username').value = currentUser.username;
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        function openPasswordModal() {
+            document.getElementById('password-form').reset();
+            document.getElementById('password-modal').classList.add('active');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.remove('active');
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newUsername = document.getElementById('edit-username').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': TOKEN
+                    },
+                    body: JSON.stringify({
+                        username: newUsername,
+                        password: currentUser.password
+                    })
+                });
+                
+                if (response.ok) {
+                    sessionStorage.setItem('username', newUsername);
+                    showAlert('Profile updated successfully!', 'success');
+                    closeEditModal();
+                    loadUserProfile();
+                } else {
+                    showAlert('Error updating profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showAlert('Error updating profile', 'error');
+            }
+        });
+
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (currentPassword !== currentUser.password) {
+                showAlert('Current password is incorrect', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 4) {
+                showAlert('Password must be at least 4 characters long', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': TOKEN
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        password: newPassword
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('Password updated successfully!', 'success');
+                    closePasswordModal();
+                    loadUserProfile();
+                } else {
+                    showAlert('Error updating password', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                showAlert('Error updating password', 'error');
+            }
+        });
+
+        async function deleteAccount() {
+            const confirmed = confirm('WARNING: This action cannot be undone!\n\nAre you absolutely sure you want to delete your account?');
+            
+            if (!confirmed) return;
+            
+            const doubleConfirm = confirm('This is your last chance. Delete account permanently?');
+            
+            if (!doubleConfirm) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': TOKEN }
+                });
+                
+                if (response.ok) {
+                    alert('Account deleted successfully. You will be logged out.');
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                } else {
+                    showAlert('Error deleting account', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                showAlert('Error deleting account', 'error');
+            }
+        }
+
+        loadUserProfile();
+    </script>
+</body>
+</html>
