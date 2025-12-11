@@ -22,6 +22,11 @@ const Task = sequelize.define('Task', {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'TASK_NAME'
+    },
+    estado: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'ESTADO'
     }
 }, {
     tableName: 'TASK',

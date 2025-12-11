@@ -1,9 +1,27 @@
+const bcrypt = require('bcryptjs');
 const Employee = require('../models/employeeModel');
 
 async function createEmployee(req, res) {
     try {
-        const employee = await Employee.create(req.body);
-        res.status(201).json(employee);
+        const { email, password, name, lastName, role } = req.body;
+
+        const existingEmployee = await Employee.findOne({ where: { Email: email } });
+        if (existingEmployee) {
+            return res.status(400).json({ error: 'Email already registered' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const employee = await Employee.create({
+            Email: email,
+            password: hashedPassword,
+            name,
+            lastName,
+            role
+        });
+
+        const { password: _, ...employeeData } = employee.toJSON();
+        res.status(201).json(employeeData);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -11,7 +29,9 @@ async function createEmployee(req, res) {
 
 async function listEmployees(req, res) {
     try {
-        const employees = await Employee.findAll();
+        const employees = await Employee.findAll({
+            attributes: { exclude: ['password'] }
+        });
         res.json(employees);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -20,8 +40,14 @@ async function listEmployees(req, res) {
 
 async function getEmployee(req, res) {
     try {
-        const employee = await Employee.findByPk(req.params.id);
-        if (!employee) return res.status(404).json({ message: "Employee not found" });
+        const employee = await Employee.findByPk(req.params.id, {
+            attributes: { exclude: ['password'] }
+        });
+        
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
+        
         res.json(employee);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -31,10 +57,19 @@ async function getEmployee(req, res) {
 async function updateEmployee(req, res) {
     try {
         const employee = await Employee.findByPk(req.params.id);
-        if (!employee) return res.status(404).json({ message: "Employee not found" });
+        
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
+
+        if (req.body.password) {
+            req.body.password = await bcrypt.hash(req.body.password, 10);
+        }
 
         await employee.update(req.body);
-        res.json(employee);
+        
+        const { password: _, ...employeeData } = employee.toJSON();
+        res.json(employeeData);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -43,7 +78,10 @@ async function updateEmployee(req, res) {
 async function deleteEmployee(req, res) {
     try {
         const employee = await Employee.findByPk(req.params.id);
-        if (!employee) return res.status(404).json({ message: "Employee not found" });
+        
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
 
         await employee.destroy();
         res.json({ message: "Employee deleted successfully" });

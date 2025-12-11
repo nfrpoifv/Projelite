@@ -1,75 +1,67 @@
 const Project = require('../models/projectModel');
 
-async function getProjects(req, res) {
+async function createProject(req, res) {
+    try {
+        const project = await Project.create(req.body);
+        res.status(201).json(project);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function listProjects(req, res) {
     try {
         const projects = await Project.findAll();
         res.json(projects);
     } catch (error) {
-        console.error('Error al obtener proyectos:', error);
         res.status(500).json({ error: error.message });
     }
 }
 
 async function getProject(req, res) {
     try {
-        const { id } = req.params;
-        const project = await Project.findByPk(id);
+        const project = await Project.findByPk(req.params.id);
         if (!project) {
-            return res.status(404).json({ error: 'Proyecto no encontrado' });
+            return res.status(404).json({ message: "Project not found" });
         }
         res.json(project);
     } catch (error) {
-        console.error('Error al obtener proyecto:', error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-async function createProject(req, res) {
-    try {
-        const { idEmployee, nameProject } = req.body; 
-        const newProject = await Project.create({ idEmployee, nameProject });
-        res.status(201).json(newProject);
-    } catch (error) {
-        console.error('Error al crear proyecto:', error);
         res.status(500).json({ error: error.message });
     }
 }
 
 async function updateProject(req, res) {
     try {
-        const { id } = req.params;
-        const { idEmployee, nameProject } = req.body;
-        const project = await Project.findByPk(id);
+        const project = await Project.findByPk(req.params.id);
         if (!project) {
-            return res.status(404).json({ error: 'Proyecto no encontrado' });
+            return res.status(404).json({ message: "Project not found" });
         }
-        await project.update({ idEmployee, nameProject });
+
+        await project.update(req.body);
         res.json(project);
     } catch (error) {
-        console.error('Error al actualizar proyecto:', error);
         res.status(500).json({ error: error.message });
     }
 }
 
 async function deleteProject(req, res) {
     try {
-        const { id } = req.params;
-        const project = await Project.findByPk(id);
+        const project = await Project.findByPk(req.params.id);
         if (!project) {
-            return res.status(404).json({ error: 'Proyecto no encontrado' });
+            return res.status(404).json({ message: "Project not found" });
         }
+
         await project.destroy();
-        res.json({ message: 'Proyecto eliminado exitosamente' });
+        res.json({ message: "Project deleted successfully" });
     } catch (error) {
-        console.error('Error al eliminar proyecto:', error);
         res.status(500).json({ error: error.message });
     }
 }
 
 module.exports = {
-    getProjects,
-    getProject,
     createProject,
+    listProjects,
+    getProject,
     updateProject,
     deleteProject
 };

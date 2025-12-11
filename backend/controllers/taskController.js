@@ -1,6 +1,15 @@
 const Task = require('../models/taskModel');
 
-async function getTasks(req, res) {
+async function createTask(req, res) {
+    try {
+        const task = await Task.create(req.body);
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function listTasks(req, res) {
     try {
         const tasks = await Task.findAll();
         res.json(tasks);
@@ -11,10 +20,9 @@ async function getTasks(req, res) {
 
 async function getTask(req, res) {
     try {
-        const { id } = req.params;
-        const task = await Task.findByPk(id);
+        const task = await Task.findByPk(req.params.id);
         if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
+            return res.status(404).json({ message: "Task not found" });
         }
         res.json(task);
     } catch (error) {
@@ -22,25 +30,14 @@ async function getTask(req, res) {
     }
 }
 
-async function createTask(req, res) {
-    try {
-        const { idEmployee, idProject, taskName } = req.body;
-        const newTask = await Task.create({ idEmployee, idProject, taskName });
-        res.status(201).json(newTask);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
 async function updateTask(req, res) {
     try {
-        const { id } = req.params;
-        const { idEmployee, idProject, taskName } = req.body;
-        const task = await Task.findByPk(id);
+        const task = await Task.findByPk(req.params.id);
         if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
+            return res.status(404).json({ message: "Task not found" });
         }
-        await task.update({ idEmployee, idProject, taskName });
+
+        await task.update(req.body);
         res.json(task);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -49,22 +46,35 @@ async function updateTask(req, res) {
 
 async function deleteTask(req, res) {
     try {
-        const { id } = req.params;
-        const task = await Task.findByPk(id);
+        const task = await Task.findByPk(req.params.id);
         if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
+            return res.status(404).json({ message: "Task not found" });
         }
+
         await task.destroy();
-        res.json({ message: 'Task deleted' });
+        res.json({ message: "Task deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function getTasksByProject(req, res) {
+    try {
+        const { projectId } = req.params;
+        const tasks = await Task.findAll({
+            where: { idProject: projectId }
+        });
+        res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
 
 module.exports = {
-    getTasks,
-    getTask,
     createTask,
+    listTasks,
+    getTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    getTasksByProject
 };
