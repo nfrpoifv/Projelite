@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projelite - Project Management</title>
+    <title>Projelite - Professional Task Management System</title>
     <style>
         * {
             margin: 0;
@@ -14,8 +14,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
             color: #fff;
-            overflow-x: hidden;
         }
 
         .navbar {
@@ -29,15 +29,13 @@
         }
 
         .navbar-brand {
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
-            color: #00d4ff;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-decoration: none;
-            transition: opacity 0.3s;
-        }
-
-        .navbar-brand:hover {
-            opacity: 0.8;
         }
 
         .navbar-links {
@@ -46,70 +44,57 @@
             align-items: center;
         }
 
-        .nav-link {
-            color: #ddd;
-            text-decoration: none;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #00d4ff;
-            transition: width 0.3s;
-        }
-
-        .nav-link:hover {
-            color: #00d4ff;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .btn-cta {
-            padding: 10px 25px;
+        .btn {
+            padding: 12px 30px;
             border: none;
-            border-radius: 8px;
-            background: rgba(138, 43, 226, 0.2);
-            color: #ba68c8;
-            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 1em;
             text-decoration: none;
             display: inline-block;
         }
 
-        .btn-cta:hover {
-            background: rgba(138, 43, 226, 0.35);
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+        }
+
+        .btn-outline:hover {
+            background: #00d4ff;
+            color: #1a1a2e;
         }
 
         .hero {
-            max-width: 900px;
-            margin: 100px auto 80px;
-            padding: 0 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 50px;
             text-align: center;
         }
 
         .hero h1 {
-            font-size: 2.8em;
+            font-size: 4em;
             margin-bottom: 20px;
-            color: #fff;
-            font-weight: 600;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
         }
 
         .hero p {
-            font-size: 1.15em;
-            color: #aaa;
-            margin-bottom: 35px;
-            line-height: 1.7;
+            font-size: 1.3em;
+            color: #ddd;
+            margin-bottom: 50px;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
@@ -117,202 +102,132 @@
 
         .hero-buttons {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn-primary {
-            padding: 14px 35px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(0, 212, 255, 0.2);
-            color: #00d4ff;
-            border: 1px solid rgba(0, 212, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1.05em;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background: rgba(0, 212, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
-        }
-
         .features {
-            max-width: 1100px;
-            margin: 100px auto;
+            max-width: 1200px;
+            margin: 80px auto;
             padding: 0 50px;
-        }
-
-        .section-title {
-            font-size: 2.2em;
-            margin-bottom: 50px;
-            color: #fff;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .features-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
 
         .feature-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 35px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2);
             border-color: rgba(0, 212, 255, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .feature-card h3 {
-            font-size: 1.4em;
+            font-size: 1.8em;
             margin-bottom: 15px;
             color: #00d4ff;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .feature-card:hover h3 {
-            color: #00ffaa;
         }
 
         .feature-card p {
-            color: #aaa;
+            color: #ddd;
             line-height: 1.6;
-            font-size: 0.98em;
+            font-size: 1.1em;
         }
 
-
-
-        .cta-section {
-            max-width: 700px;
-            margin: 100px auto;
-            padding: 50px;
+        .footer {
             text-align: center;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .cta-section h2 {
-            font-size: 2.2em;
-            margin-bottom: 15px;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .cta-section p {
-            font-size: 1.05em;
-            color: #aaa;
-            margin-bottom: 30px;
-        }
-
-        footer {
-            padding: 40px 50px;
+            padding: 40px;
+            margin-top: 100px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 50px;
-        }
-
-        @media (max-width: 968px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
+            color: #888;
         }
 
         @media (max-width: 768px) {
             .navbar {
                 padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
             }
 
             .navbar-links {
                 gap: 15px;
             }
 
-            .hero, .features {
-                padding: 0 20px;
-            }
-
             .hero {
-                margin: 60px auto 60px;
+                padding: 80px 20px;
             }
 
             .hero h1 {
-                font-size: 2.2em;
+                font-size: 2.5em;
             }
 
-            .cta-section {
-                padding: 40px 30px;
-                margin: 80px 20px;
+            .hero p {
+                font-size: 1.1em;
+            }
+
+            .features {
+                padding: 0 20px;
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <a href="#" class="navbar-brand">Projelite</a>
+        <a href="index.html" class="navbar-brand">Projelite</a>
         <div class="navbar-links">
-            <a href="#features" class="nav-link">Features</a>
-            <a href="login.html" class="btn-cta">Sign In</a>
+            <a href="login/login-company.html" class="btn btn-outline">Sign In</a>
+            <a href="login/register.html" class="btn">Get Started</a>
         </div>
     </nav>
 
     <section class="hero">
-        <h1>Simple Project Management</h1>
-        <p>A straightforward tool to manage your projects, tasks, and team members. Keep track of what matters without the complexity.</p>
+        <h1>Manage Your Team Professionally</h1>
+        <p>Complete project and task management system for modern businesses. Streamline workflows, track progress, and boost productivity.</p>
         <div class="hero-buttons">
-            <a href="login.html" class="btn-primary">Get Started</a>
+            <a href="login/register.html" class="btn">Start Free</a>
+            <a href="login/login-employee.html" class="btn btn-outline">Employee Login</a>
         </div>
     </section>
 
-    <section id="features" class="features">
-        <h2 class="section-title">What It Does</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Manage Employees</h3>
-                <p>Add and manage employee records, update information, and view employee details in an organized dashboard.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Track Projects</h3>
-                <p>Create projects, assign employees, and track progress through simple workflows and visual boards.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Organize Tasks</h3>
-                <p>Assign tasks to employees and projects, monitor completion status, and manage workload distribution efficiently.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Profile Customization</h3>
-                <p>Personalize your profile, update your information, manage account settings, and control your preferences.</p>
-            </div>
+    <section class="features">
+        <div class="feature-card">
+            <h3>Employee Management</h3>
+            <p>Manage your team efficiently and effectively with complete control over user accounts, roles, and permissions.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Project Tracking</h3>
+            <p>Track all your projects in real-time with detailed insights, progress monitoring, and status updates.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Task Assignment</h3>
+            <p>Assign and monitor tasks with automatic status updates. Keep everyone on the same page with clear responsibilities.</p>
         </div>
     </section>
-    <section class="cta-section">
-        <h2>Ready to Get Started?</h2>
-        <p>Start organizing your projects and team today.</p>
-        <a href="login.html" class="btn-primary">Try It Now</a>
-    </section>
 
-    <footer>
-        <p>&copy; 2024 Projelite. Personal project by Eithan Araya</p>
+    <footer class="footer">
+        <p>&copy; 2024 Projelite. All rights reserved.</p>
     </footer>
 </body>
 </html>
