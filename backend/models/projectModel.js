@@ -13,10 +13,15 @@ const Project = sequelize.define('Project', {
         allowNull: true, 
         field: 'IDEMPLOYEE'
     },
-    nameProject: {
+    name: {  
         type: DataTypes.STRING,
         allowNull: true, 
         field: 'NAME_PROJECT' 
+    },
+    description: {  
+        type: DataTypes.TEXT,
+        allowNull: true, 
+        field: 'DESCRIPTION' 
     }
 }, {
     tableName: 'PROJECT',

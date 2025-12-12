@@ -18,12 +18,17 @@ const Task = sequelize.define('Task', {
         allowNull: true,
         field: 'IDPROJECT'
     },
-    taskName: {
+    name: {                 
         type: DataTypes.STRING,
         allowNull: false,
         field: 'TASK_NAME'
     },
-    estado: {
+    description: {             
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: 'DESCRIPTION'
+    },
+    status: {              
         type: DataTypes.STRING,
         allowNull: true,
         field: 'ESTADO'

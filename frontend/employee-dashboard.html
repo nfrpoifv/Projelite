@@ -339,196 +339,257 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8080';
-        let tasks = [];
-        let projects = [];
+    const API_URL = 'http://localhost:8080';
+    let tasks = [];
+    let projects = [];
 
-        function checkAuth() {
-            const token = localStorage.getItem('token');
-            const userType = localStorage.getItem('userType');
-            
-            if (!token || userType !== 'employee') {
-                window.location.href = 'login-employee.html';
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const userType = localStorage.getItem('userType');
+        
+        console.log('Auth check:', { 
+            hasToken: !!token, 
+            userType: userType,
+            tokenPreview: token ? token.substring(0, 20) + '...' : 'none'
+        });
+        
+        if (!token || userType !== 'employee') {
+            console.log('Auth failed, redirecting to login...');
+            window.location.replace('login-employee.html');
+            return false;
+        }
+
+        const employeeName = localStorage.getItem('employeeName');
+        document.getElementById('employeeName').textContent = employeeName || 'Employee';
+        return true;
+    }
+
+    function showAlert(message, type) {
+        const alert = document.getElementById('alert');
+        alert.textContent = message;
+        alert.className = `alert alert-${type} show`;
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+
+    function switchTab(tabName) {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => tab.classList.remove('active'));
+        contents.forEach(content => content.classList.remove('active'));
+
+        document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+    }
+
+    async function loadTasks() {
+        const token = localStorage.getItem('token');
+        
+        console.log('Loading tasks...');
+        
+        try {
+            const response = await fetch(`${API_URL}/employee/tasks`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Tasks response:', response.status, response.statusText);
+
+            if (response.status === 401 || response.status === 403) {
+                showAlert('Session expired. Please login again.', 'error');
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.replace('index.html');
+                }, 2000);
                 return;
             }
 
-            const employeeName = localStorage.getItem('employeeName');
-            document.getElementById('employeeName').textContent = employeeName || 'Employee';
-        }
-
-        function showAlert(message, type) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = `alert alert-${type} show`;
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 5000);
-        }
-
-        function switchTab(tabName) {
-            const tabs = document.querySelectorAll('.tab');
-            const contents = document.querySelectorAll('.tab-content');
-
-            tabs.forEach(tab => tab.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}Tab`).classList.add('active');
-        }
-
-        async function loadTasks() {
-            const token = localStorage.getItem('token');
-            
-            try {
-                const response = await fetch(`${API_URL}/employee/tasks`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    tasks = await response.json();
-                    renderTasks();
-                    updateStats();
-                } else {
-                    showAlert('Failed to load tasks', 'error');
-                }
-            } catch (error) {
-                showAlert('Network error', 'error');
+            if (response.ok) {
+                tasks = await response.json();
+                console.log('Tasks loaded:', tasks.length, tasks);
+                renderTasks();
+                updateStats();
+            } else {
+                const error = await response.json();
+                console.error('Tasks error:', error);
+                showAlert(error.message || error.error || 'Failed to load tasks', 'error');
             }
+        } catch (error) {
+            console.error('Network error loading tasks:', error);
+            showAlert('Network error loading tasks', 'error');
         }
+    }
 
-        async function loadProjects() {
-            const token = localStorage.getItem('token');
-            
-            try {
-                const response = await fetch(`${API_URL}/employee/projects`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    projects = await response.json();
-                    renderProjects();
-                } else {
-                    showAlert('Failed to load projects', 'error');
+    async function loadProjects() {
+        const token = localStorage.getItem('token');
+        
+        console.log('Loading projects...');
+        
+        try {
+            const response = await fetch(`${API_URL}/employee/projects`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
-            } catch (error) {
-                showAlert('Network error', 'error');
+            });
+
+            console.log('Projects response:', response.status, response.statusText);
+
+            if (response.status === 401 || response.status === 403) {
+                showAlert('Session expired. Please login again.', 'error');
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.replace('login-employee.html');
+                }, 2000);
+                return;
             }
+
+            if (response.ok) {
+                projects = await response.json();
+                console.log('Projects loaded:', projects.length, projects);
+                renderProjects();
+            } else {
+                const error = await response.json();
+                console.error('Projects error:', error);
+                showAlert(error.message || error.error || 'Failed to load projects', 'error');
+            }
+        } catch (error) {
+            console.error('Network error loading projects:', error);
+            showAlert('Network error loading projects', 'error');
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('totalTasks').textContent = tasks.length;
+        document.getElementById('receivedTasks').textContent = tasks.filter(t => t.status === 'Received').length;
+        document.getElementById('inProgressTasks').textContent = tasks.filter(t => t.status === 'In Progress').length;
+        document.getElementById('completedTasks').textContent = tasks.filter(t => t.status === 'Completed').length;
+    }
+
+    function getStatusClass(status) {
+        if (status === 'Received') return 'status-received';
+        if (status === 'In Progress') return 'status-in-progress';
+        if (status === 'Completed') return 'status-completed';
+        return 'status-received';
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('tasksContainer');
+        
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No tasks assigned</h3>
+                    <p>You don't have any tasks assigned yet</p>
+                </div>
+            `;
+            return;
         }
 
-        function updateStats() {
-            document.getElementById('totalTasks').textContent = tasks.length;
-            document.getElementById('receivedTasks').textContent = tasks.filter(t => t.status === 'Received').length;
-            document.getElementById('inProgressTasks').textContent = tasks.filter(t => t.status === 'In Progress').length;
-            document.getElementById('completedTasks').textContent = tasks.filter(t => t.status === 'Completed').length;
-        }
-
-        function getStatusClass(status) {
-            if (status === 'Received') return 'status-received';
-            if (status === 'In Progress') return 'status-in-progress';
-            if (status === 'Completed') return 'status-completed';
-            return 'status-received';
-        }
-
-        function renderTasks() {
-            const container = document.getElementById('tasksContainer');
-            
-            if (tasks.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No tasks assigned</h3>
-                        <p>You don't have any tasks assigned yet</p>
+        container.innerHTML = tasks.map(task => `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${task.name || 'Unnamed Task'}</div>
+                    <select class="status-select" onchange="updateTaskStatus(${task.id}, this.value)">
+                        <option value="Received" ${task.status === 'Received' ? 'selected' : ''}>Received</option>
+                        <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                        <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>
+                </div>
+                <div class="card-content">
+                    <p>${task.description || 'No description'}</p>
+                    <div class="project-info">
+                        Task ID: ${task.id} | Project ID: ${task.idProject || 'N/A'}
                     </div>
-                `;
-                return;
-            }
+                </div>
+            </div>
+        `).join('');
+    }
 
-            container.innerHTML = tasks.map(task => `
+    function renderProjects() {
+        const container = document.getElementById('projectsContainer');
+        
+        if (projects.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No projects assigned</h3>
+                    <p>You are not assigned to any projects yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = projects.map(project => {
+            const projectTasks = tasks.filter(t => t.idProject === project.id);
+            
+            return `
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">${task.name}</div>
-                        <select class="status-select" onchange="updateTaskStatus(${task.id}, this.value)">
-                            <option value="Received" ${task.status === 'Received' ? 'selected' : ''}>Received</option>
-                            <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                            <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                        </select>
+                        <div class="card-title">${project.name || 'Unnamed Project'}</div>
+                        <span class="status-badge status-in-progress">${projectTasks.length} Tasks</span>
                     </div>
                     <div class="card-content">
-                        <p>${task.description}</p>
+                        <p>${project.description || 'No description'}</p>
                         <div class="project-info">
-                            Task ID: ${task.id} | Project ID: ${task.idProject}
+                            Project ID: ${project.id}
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
+            `;
+        }).join('');
+    }
 
-        function renderProjects() {
-            const container = document.getElementById('projectsContainer');
-            
-            if (projects.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No projects assigned</h3>
-                        <p>You are not assigned to any projects yet</p>
-                    </div>
-                `;
-                return;
+    async function updateTaskStatus(taskId, newStatus) {
+        const token = localStorage.getItem('token');
+
+        console.log('Updating task status:', taskId, newStatus);
+
+        try {
+            const response = await fetch(`${API_URL}/employee/tasks/${taskId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                showAlert('Task status updated successfully', 'success');
+                await loadTasks();
+            } else {
+                const error = await response.json();
+                showAlert(error.message || error.error || 'Failed to update task status', 'error');
+                await loadTasks();
             }
-
-            container.innerHTML = projects.map(project => {
-                const projectTasks = tasks.filter(t => t.idProject === project.id);
-                
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">${project.name}</div>
-                            <span class="status-badge status-in-progress">${projectTasks.length} Tasks</span>
-                        </div>
-                        <div class="card-content">
-                            <p>${project.description}</p>
-                            <div class="project-info">
-                                Project ID: ${project.id}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        } catch (error) {
+            console.error('Error updating task status:', error);
+            showAlert('Network error', 'error');
+            await loadTasks();
         }
+    }
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+    console.log('Current localStorage:', {
+        token: localStorage.getItem('token') ? 'exists' : 'missing',
+        userType: localStorage.getItem('userType'),
+        employeeId: localStorage.getItem('employeeId'),
+        employeeName: localStorage.getItem('employeeName')
+    });
 
-        async function updateTaskStatus(taskId, newStatus) {
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/employee/tasks/${taskId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                });
-
-                if (response.ok) {
-                    showAlert('Task status updated successfully', 'success');
-                    loadTasks();
-                } else {
-                    showAlert('Failed to update task status', 'error');
-                    loadTasks();
-                }
-            } catch (error) {
-                showAlert('Network error', 'error');
-                loadTasks();
-            }
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
-
-        checkAuth();
+    if (checkAuth()) {
+        console.log('Auth successful, loading data...');
         loadTasks();
         loadProjects();
-    </script>
+    } else {
+        console.log('Auth failed');
+    }
+</script>
 </body>
 </html>
