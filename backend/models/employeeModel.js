@@ -8,6 +8,11 @@ const Employee = sequelize.define('Employee', {
         autoIncrement: true,
         field: 'IDEMPLOYEE'
     },
+    idUser: {  
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'IDUSER'
+    },
     Email: {
         type: DataTypes.STRING,
         allowNull: false,

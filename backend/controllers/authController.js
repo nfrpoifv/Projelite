@@ -82,6 +82,7 @@ async function loginEmployee(req, res) {
         const token = jwt.sign(
             { 
                 employeeId: employee.employeeId,
+                userId: employee.idUser,  
                 type: 'employee' 
             },
             process.env.JWT_SECRET,

@@ -8,6 +8,11 @@ const Project = sequelize.define('Project', {
         autoIncrement: true, 
         field: 'IDPROJECT'
     },
+    idUser: {  
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'IDUSER'
+    },
     idEmployee: {
         type: DataTypes.INTEGER,
         allowNull: true, 

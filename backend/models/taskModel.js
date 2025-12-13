@@ -8,6 +8,11 @@ const Task = sequelize.define('Task', {
         autoIncrement: true,
         field: 'IDTASK'
     },
+    idUser: {  
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'IDUSER'
+    },
     idEmployee: {
         type: DataTypes.INTEGER,
         allowNull: true,

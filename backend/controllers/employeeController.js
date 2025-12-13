@@ -17,7 +17,8 @@ async function createEmployee(req, res) {
             password: hashedPassword,
             name,
             lastName,
-            role
+            role,
+            idUser: req.user.userId 
         });
 
         const { password: _, ...employeeData } = employee.toJSON();
@@ -30,6 +31,7 @@ async function createEmployee(req, res) {
 async function listEmployees(req, res) {
     try {
         const employees = await Employee.findAll({
+            where: { idUser: req.user.userId },  
             attributes: { exclude: ['password'] }
         });
         res.json(employees);
@@ -40,7 +42,11 @@ async function listEmployees(req, res) {
 
 async function getEmployee(req, res) {
     try {
-        const employee = await Employee.findByPk(req.params.id, {
+        const employee = await Employee.findOne({
+            where: { 
+                employeeId: req.params.id,
+                idUser: req.user.userId  
+            },
             attributes: { exclude: ['password'] }
         });
         
@@ -56,7 +62,12 @@ async function getEmployee(req, res) {
 
 async function updateEmployee(req, res) {
     try {
-        const employee = await Employee.findByPk(req.params.id);
+        const employee = await Employee.findOne({
+            where: { 
+                employeeId: req.params.id,
+                idUser: req.user.userId  
+            }
+        });
         
         if (!employee) {
             return res.status(404).json({ message: "Employee not found" });
@@ -66,6 +77,7 @@ async function updateEmployee(req, res) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }
 
+        delete req.body.idUser;  
         await employee.update(req.body);
         
         const { password: _, ...employeeData } = employee.toJSON();
@@ -77,7 +89,12 @@ async function updateEmployee(req, res) {
 
 async function deleteEmployee(req, res) {
     try {
-        const employee = await Employee.findByPk(req.params.id);
+        const employee = await Employee.findOne({
+            where: { 
+                employeeId: req.params.id,
+                idUser: req.user.userId  
+            }
+        });
         
         if (!employee) {
             return res.status(404).json({ message: "Employee not found" });
