@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        DB_HOST    = credentials('DB_HOST')
+        DB_USER    = credentials('DB_USER')
+        PASSWORD   = credentials('PASSWORD')
+        DATABASE   = credentials('DATABASE')
+        JWT_SECRET = credentials('JWT_SECRET')
+        PORT       = credentials('PORT')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Docker Build & Deploy') {
+            steps {
+                sh '''
+                docker compose down
+                docker compose build
+                docker compose up -d
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Projelite deployed successfully'
+        }
+        failure {
+            echo 'Deployment failed'
+        }
+    }
+}
