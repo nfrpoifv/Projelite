@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    environment {
+        DB_HOST    = credentials('DB_HOST')
+        DB_USER    = credentials('DB_USER')
+        PASSWORD   = credentials('PASSWORD')
+        DATABASE   = credentials('DATABASE')
+        JWT_SECRET = credentials('JWT_SECRET')
+        PORT       = credentials('PORT')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -8,11 +17,12 @@ pipeline {
             }
         }
 
-        stage('Build & Deploy Docker') {
+        stage('Docker Build & Deploy') {
             steps {
                 bat """
-                docker-compose build
-                docker-compose up -d
+                docker compose down
+                docker compose build
+                docker compose up -d
                 """
             }
         }
@@ -20,10 +30,10 @@ pipeline {
 
     post {
         success {
-            echo 'All containers are up and running!'
+            echo 'Projelite deployed successfully'
         }
         failure {
-            echo 'Deployment failed!'
+            echo 'Deployment failed'
         }
     }
 }
