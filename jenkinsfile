@@ -1,40 +1,29 @@
 pipeline {
     agent any
 
-    environment {
-        DB_HOST    = credentials('DB_HOST')
-        DB_USER    = credentials('DB_USER')
-        PASSWORD   = credentials('PASSWORD')
-        DATABASE   = credentials('DATABASE')
-        JWT_SECRET = credentials('JWT_SECRET')
-        PORT       = credentials('PORT')
-    }
-
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Docker Build & Deploy') {
+        stage('Build & Deploy Docker') {
             steps {
-                sh '''
-                docker compose down
-                docker compose build
-                docker compose up -d
-                '''
+                bat """
+                docker-compose build
+                docker-compose up -d
+                """
             }
         }
     }
 
     post {
         success {
-            echo 'Projelite deployed successfully'
+            echo 'All containers are up and running!'
         }
         failure {
-            echo 'Deployment failed'
+            echo 'Deployment failed!'
         }
     }
 }
