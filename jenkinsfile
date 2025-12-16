@@ -1,15 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DB_HOST    = credentials('DB_HOST')
-        DB_USER    = credentials('DB_USER')
-        PASSWORD   = credentials('PASSWORD')
-        DATABASE   = credentials('DATABASE')
-        JWT_SECRET = credentials('JWT_SECRET')
-        PORT       = credentials('PORT')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -19,11 +10,27 @@ pipeline {
 
         stage('Docker Build & Deploy') {
             steps {
-                bat """
-                docker compose down
-                docker compose build
-                docker compose up -d
-                """
+                withCredentials([
+                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                    string(credentialsId: 'DB_USER', variable: 'DB_USER'),
+                    string(credentialsId: 'PASSWORD', variable: 'PASSWORD'),
+                    string(credentialsId: 'DATABASE', variable: 'DATABASE'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'PORT', variable: 'PORT')
+                ]) {
+                    bat """
+                    set DB_HOST=%DB_HOST%
+                    set DB_USER=%DB_USER%
+                    set DB_PASSWORD=%PASSWORD%
+                    set DATABASE=%DATABASE%
+                    set JWT_SECRET=%JWT_SECRET%
+                    set PORT=%PORT%
+                    
+                    docker compose down
+                    docker compose build
+                    docker compose up -d
+                    """
+                }
             }
         }
     }
