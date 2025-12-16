@@ -13,19 +13,19 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
                     string(credentialsId: 'DB_USER', variable: 'DB_USER'),
-                    string(credentialsId: 'PASSWORD', variable: 'PASSWORD'),
-                    string(credentialsId: 'DATABASE', variable: 'DATABASE'),
+                    string(credentialsId: 'PASSWORD', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'DATABASE', variable: 'DB_NAME'),
                     string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                     string(credentialsId: 'PORT', variable: 'PORT')
                 ]) {
                     bat """
                     set DB_HOST=%DB_HOST%
                     set DB_USER=%DB_USER%
-                    set DB_PASSWORD=%PASSWORD%
-                    set DATABASE=%DATABASE%
+                    set DB_PASSWORD=%DB_PASSWORD%
+                    set DB_NAME=%DB_NAME%
                     set JWT_SECRET=%JWT_SECRET%
                     set PORT=%PORT%
-                    
+
                     docker compose down
                     docker compose build
                     docker compose up -d
